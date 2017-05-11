@@ -1,0 +1,17 @@
+## Milestone
+
+- parsing .BLV
+	- lettura descrizione 
+	- lettura tutte sottosezioni
+
+- openGL
+	- hello world 
+	- verificare x windows
+	- visualizz 2D BLV
+
+- parsing .ODM
+	- lettura tutte sottosezioni
+
+
+- visualizzatore 3D
+

@@ -2,6 +2,7 @@
 #define _PARSER_H
 
 #include <stdio.h>
+#include <stdint.h>
 
 
 struct lod_gheader {
@@ -31,6 +32,19 @@ struct blv_compressed_blv6_header
   unsigned long compressed_size;
   unsigned long uncompressed_size;
 //  unsigned char data[];
+};
+
+
+struct blv_header
+{
+  uint32_t unknown1;         // maybe flags?
+  char description[76];    // maybe it's actually smaller and is followed by other data
+  char unknown2[24];       // some kind of reference? short-name for the level?
+  int32_t wall_vertex_size;
+  int32_t r_datasize;
+  int32_t rl_datasize;
+  int32_t unksize2;
+  int32_t unknown3[4];
 };
 
 

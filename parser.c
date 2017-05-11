@@ -1,7 +1,9 @@
 #include "parser.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <zlib.h>
 
 
 void parse_lod(const char filename[]) {
@@ -21,7 +23,7 @@ void parse_lod(const char filename[]) {
 	printf("--------------------------------------\n");
 
 	curr_lod_pos = header.dir_start;
-	for (int i_lod_entry = 0; i_lod_entry < header.num_files; i_lod_entry ++) {
+	for (unsigned int i_lod_entry = 0; i_lod_entry < header.num_files; i_lod_entry ++) {
 		read_lod_dir_entry(fp, curr_lod_pos, &dir_entry);
 		//printf("%.16s  pos %ld offset %ld, length %ld\n", dir_entry.name, curr_lod_pos, dir_entry.start_offset, dir_entry.length);
 		printf("Reading %.16s\n", dir_entry.name);
@@ -63,37 +65,37 @@ void read_lod_dir_entry(FILE *fp, unsigned long pos, struct lod_dir_entry *p_dir
 }
 
 void read_blv(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry) {
-	struct blv_compressed_blv6_header blv_header;
+	struct blv_compressed_blv6_header compr_header;
 	//printf("pos: %lu, start_offset: %lu\n", pos, p_dir_entry->start_offset);
 
 	//unsigned long tot_offset = curr_pos + p_dir_entry->start_offset;
 	unsigned long tot_offset = sizeof(struct lod_gheader) + p_dir_entry->start_offset;
 	fseek(fp, tot_offset, SEEK_SET);
-	fread(&blv_header, sizeof(blv_header), 1, fp);
+	fread(&compr_header, sizeof(compr_header), 1, fp);
 
-	// printf("curr_pos: %lu, start_offset: %lu. tot_offset: %lu \n", 
-	// 	curr_pos, p_dir_entry->start_offset, tot_offset);
-	// printf("compressed_size: %lu, uncompressed_size: %lu\n", 
-	// 	blv_header.compressed_size, blv_header.uncompressed_size);
+	//printf("compressed_size: %lu, uncompressed_size: %lu\n", 
+	// 	compr_header.compressed_size, compr_header.uncompressed_size);
 
-/*
-	for (long i_offset=-50000; i_offset < 50000; i_offset += 1) {
-		unsigned long my_offset = curr_pos + p_dir_entry->start_offset + i_offset;
-		fseek(fp, my_offset, SEEK_SET);
+	unsigned char *compr_data = (unsigned char *)malloc(compr_header.compressed_size);
+	fread(compr_data, (int)compr_header.compressed_size, 1, fp);
 
-		fread(&blv_header, 2*sizeof(unsigned long), 1, fp);
-		//printf("compressed_size: %ld, uncompressed_size: %ld\n", 
-		//	blv_header.compressed_size, blv_header.uncompressed_size);
+	void *blv_data = malloc(compr_header.uncompressed_size);
+	unsigned long read_len = compr_header.uncompressed_size;
+ 	int rc = uncompress((unsigned char *)blv_data, &read_len, compr_data, compr_header.compressed_size);
+ 	struct blv_header *p_blv_header = (struct blv_header *)blv_data;
 
-		if (blv_header.compressed_size > 0 && 
-			blv_header.compressed_size < blv_header.uncompressed_size &&
-			blv_header.compressed_size < 1000*1000 &&
-			blv_header.uncompressed_size < 1000*1000*10 ) {
-			printf("OK!! my_offset: %lu; compressed_size: %ld, uncompressed_size: %ld\n", 
-			my_offset, blv_header.compressed_size, blv_header.uncompressed_size);
-			//break;
-		}
-	}
+ 	if (read_len != compr_header.uncompressed_size) {
+ 		printf("!! error uncompressing BLV: %.16s; read_len:%lu; unc_len: %lu \n", 
+ 			p_dir_entry->name, read_len, compr_header.uncompressed_size);
+ 		goto cleanup_blv;
+ 	}
 
-*/
+ 	printf("-- description: [%.76s] \n", p_blv_header->description);
+
+cleanup_blv:
+	//if (compr_data)
+	//	free(compr_data);
+
+	if (blv_data)
+		free(blv_data);
 }
