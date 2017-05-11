@@ -1,0 +1,7 @@
+# C byproducts
+*.o
+*.x
+
+# proprietary gamedata
+*.lod
+
