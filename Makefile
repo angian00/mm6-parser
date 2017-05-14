@@ -7,7 +7,7 @@ LIBS=-lz
 #LDLIBS=
 EXECUTABLE=mm6_parse.x
 
-all: $(SOURCES) $(EXECUTABLE)
+all: $(SOURCES) $(EXECUTABLE) $()
     
 $(EXECUTABLE): $(OBJECTS) 
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@ $(LIBS)

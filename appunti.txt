@@ -1,0 +1,8 @@
+
+Specifiche formati game files: 
+	http://rewiki.regengedanken.de/wiki/Might_and_Magic_6
+
+
+Might and Magic 6-8 Level Editor su sourceforge:
+https://sourceforge.net/projects/mm8leveleditor/files/
+

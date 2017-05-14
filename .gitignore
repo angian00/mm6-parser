@@ -3,5 +3,8 @@
 *.x
 
 # proprietary gamedata
-*.lod
+data/*.lod
+
+# downloaded external tools (other implementations etc.)
+ext-resources
 
