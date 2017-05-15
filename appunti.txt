@@ -3,6 +3,25 @@ Specifiche formati game files:
 	http://rewiki.regengedanken.de/wiki/Might_and_Magic_6
 
 
-Might and Magic 6-8 Level Editor su sourceforge:
+## Might and Magic 6-8 Level Editor
 https://sourceforge.net/projects/mm8leveleditor/files/
+
+Editor su sourceforge, con diverse versioni
+
+	- unlod
+		sembra solo LOD extractor
+	- MM8LevelEditor-package-src-3.47
+		contiene un po' di documentaz incompleta sui formati, 
+		e dei parser, ad es. src/org/gamenet/application/mm8leveleditor/data/mm6/outdoor/OutdoorDataMap.java
+		E' anche hostato su github:
+		https://github.com/angeld29/mm8leveleditor
+
+
+## Sergey Rozhenko aka GrayFace Homepage
+https://sites.google.com/site/sergroj/mm#TOC-Game-Mechanics
+
+Molto ricco, con patch, contenuti originali, documentaz completa sul linguaggio di scripting.
+
+
+"Look into Editor.CompileBlv in Editor Data.lua and Editor.CompileOdm in Editor Odm Data.lua. Then you can see structures used in Strcts\01 common..."
 

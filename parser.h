@@ -58,7 +58,7 @@ struct vertex_section
 
     struct vertex
     {
-      int16_t x, y, z;
+      uint16_t x, y, z;
     };
 
 
@@ -169,7 +169,7 @@ struct object_section
 
     struct object
     {
-        char name[16];
+        char name[16]; //ex. Torch1?
         int16_t unk1[4];
         int16_t x;
         int16_t y;
@@ -223,7 +223,8 @@ struct outline_section
 
     struct outline
     {
-       int16_t x1,y1,x2,y2,z,unk;
+       //int16_t x1,y1,x2,y2,z,unk;
+        uint16_t i_v1, i_v2, i_w1, i_w2, z, bits;
     };
 
 
@@ -249,7 +250,9 @@ struct blv_data
 //--------------------------------------------------------------
 
 
+void list_levels(const char lod_name[]);
 void parse_level(const char lod_name[], const char level_name[]);
+void uncompress_lod(const char lod_name[]);
 
 void dump_lod_header();
 void dump_blv();
