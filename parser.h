@@ -56,10 +56,10 @@ struct vertex_section
     //struct vertex vertices[];
 };
 
-    struct vertex
-    {
-      uint16_t x, y, z;
-    };
+struct vertex
+{
+  uint16_t x, y, z;
+};
 
 
 struct wall_section
@@ -68,32 +68,23 @@ struct wall_section
     //struct wall walls[];
 };
 
-    struct wall
-    {
-        int32_t i_normal_x,i_normal_y,i_normal_z,i_dist;   // plane by normal vector and point, all numbers multiply by 65536, so i_normal_x=int(normal_x*65536.0)
-        int32_t zcalc1;   // zcalc1 = -(i_normal_x << 16) / i_normal_z    (or 0 in case i_normal_z == 0)
-        int32_t zcalc2;   // zcalc2 = -(i_normal_y << 16) / i_normal_z    (or 0 in case i_normal_z == 0)
-        int32_t zcalc3;   // zcalc3 = -(i_dist << 16) / i_normal_z  (or 0 in case i_normal_z == 0)
-        int32_t bits;   // various attributes, see below
-        int32_t ingame_pointers[6]; //pointers on wall vertex data, filled by game on load(data in blv file not used)
-        int16_t face_param_index;       // index in FaceParams array
-        int16_t unknown3;
-        int16_t sector_index[2]; //the indices of sectors(sectors section) in which is located the wall
-        int16_t xmin, xmax;
-        int16_t ymin, ymax;
-        int16_t zmin, zmax;
-        char orientation_type;        // 5 - ceiling, 6 - in-between ceiling and wall, 1 - vertical wall, 4 - in-between floor and wall, 3 - floor
-        unsigned char num_vertices;
-        int16_t unknown4;       // always zero (alignment?)
-    };
-
-
-/*
-struct texture textures[num_walls];
-*/
-
-struct texture {
-    char name[10];
+struct wall
+{
+    int32_t i_normal_x,i_normal_y,i_normal_z,i_dist;   // plane by normal vector and point, all numbers multiply by 65536, so i_normal_x=int(normal_x*65536.0)
+    int32_t zcalc1;   // zcalc1 = -(i_normal_x << 16) / i_normal_z    (or 0 in case i_normal_z == 0)
+    int32_t zcalc2;   // zcalc2 = -(i_normal_y << 16) / i_normal_z    (or 0 in case i_normal_z == 0)
+    int32_t zcalc3;   // zcalc3 = -(i_dist << 16) / i_normal_z  (or 0 in case i_normal_z == 0)
+    int32_t bits;   // various attributes, see below
+    int32_t ingame_pointers[6]; //pointers on wall vertex data, filled by game on load(data in blv file not used)
+    int16_t face_param_index;       // index in FaceParams array
+    int16_t unknown3;
+    int16_t sector_index[2]; //the indices of sectors(sectors section) in which is located the wall
+    int16_t xmin, xmax;
+    int16_t ymin, ymax;
+    int16_t zmin, zmax;
+    char orientation_type;        // 5 - ceiling, 6 - in-between ceiling and wall, 1 - vertical wall, 4 - in-between floor and wall, 3 - floor
+    unsigned char num_vertices;
+    int16_t unknown4;       // always zero (alignment?)
 };
 
 
@@ -109,6 +100,14 @@ struct wall_vertices
 };
 */
 
+/*
+struct texture textures[num_walls];
+*/
+
+struct texture {
+    char name[10];
+};
+
 
 struct face_section
 {
@@ -119,38 +118,41 @@ struct face_section
 
 };
 
-    struct face_param_data
-    {
-        int16_t  unk1[6];
-        int16_t  someIndex;  // maybe index into texture list?
-        int16_t  unk2;       // always -1 ?
-        int16_t  unk3[2];
-        int16_t  dx, dy; //texture deltas (off 0x14)
-        int16_t  unk4;
-        uint16_t event_n; // # of event in map evt file
-        int16_t  unk5[4];   // always 0 ?
-    };
+struct face_param_data
+{
+    int16_t  unk1[6];
+    int16_t  someIndex;  // maybe index into texture list?
+    int16_t  unk2;       // always -1 ?
+    int16_t  unk3[2];
+    int16_t  dx, dy; //texture deltas (off 0x14)
+    int16_t  unk4;
+    uint16_t event_n; // # of event in map evt file
+    int16_t  unk5[4];   // always 0 ?
+};
 
-    struct face_param_data_2
-    {
-        char unknown[10]; //may be name for second texture(usualy filled by zero)
-    };
+struct face_param_data_2
+{
+    char unknown[10]; //may be name for second texture(usualy filled by zero)
+};
 
 
 
-struct sectors_section
+struct room_section
 {
     uint32_t count; 
-    //struct sector sectors[];
+    //struct room sectors[];
 
     //char sectors_rdata[Header.Rdatasize];
     //char sectors_rldata[Header.RLdatasize];
 };
 
-    struct sector
-    {
-       char unk[0x74]; 
-    };
+struct room
+{
+   char unk[0x74];
+};
+
+//TODO: door.count
+
 
 struct object_section
 {
@@ -160,22 +162,22 @@ struct object_section
     //struct object names[num_objects];
 };
 
-    struct obj_unk
-    {
-        int16_t unk1;
-        int16_t unk2;
-        int16_t unk3[12];
-    };
+struct obj_unk
+{
+    int16_t unk1;
+    int16_t unk2;
+    int16_t unk3[12];
+};
 
-    struct object
-    {
-        char name[16]; //ex. Torch1?
-        int16_t unk1[4];
-        int16_t x;
-        int16_t y;
-        int16_t z;
-        int16_t unk2;
-    };
+struct object
+{
+    char name[16]; //ex. Torch1?
+    int16_t unk1[4];
+    int16_t x;
+    int16_t y;
+    int16_t z;
+    int16_t unk2;
+};
 
 struct light_section
 {
@@ -183,24 +185,24 @@ struct light_section
     //struct light lights[n];
 };
 
-    struct light
-    {
-        int16_t x, y, z;
-        int16_t unk1; //usualy 0
-        int16_t unk2; //usualy 31
-        int16_t level; //light brightness
-    };
-
-struct unknown_section
+struct light
 {
-    uint32_t count;
-    //struct unknown unknown[];
+    int16_t x, y, z;
+    int16_t unk1; //usualy 0
+    int16_t unk2; //usualy 31
+    int16_t level; //light brightness
 };
 
-    struct unknown_item
-    {
-        uint16_t unknown[4];
-    };
+struct bsp_node_section
+{
+    uint32_t count;
+    //struct bsp_node bsp_node[];
+};
+
+struct bsp_node
+{
+    uint16_t unknown[4];
+};
 
 
 struct spawn_section
@@ -236,15 +238,24 @@ struct blv_data
 
     struct blv_header *p_blv_header;
     struct vertex_section *p_vertex_section;
+    struct vertex *vertices;
     struct wall_section *p_wall_section;
     struct wall *walls;
+    struct texture *textures;
     struct face_section *p_face_section;
-    struct sectors_section *p_sectors_section;
+    struct face *faces;
+    struct room_section *p_room_section;
+    struct room *rooms;
     struct object_section *p_object_section;
+    struct object *objects;
     struct light_section *p_light_section;
-    struct unknown_section *p_unknown_section;
+    struct light *lights;
+    struct bsp_node_section *p_bsp_node_section;
+    struct bsp_node *bsp_nodes;
     struct spawn_section *p_spawn_section;
+    struct spawn *spawns;
     struct outline_section *p_outline_section;
+    struct outline *outlines;
 };
 
 //--------------------------------------------------------------

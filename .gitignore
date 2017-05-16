@@ -5,6 +5,8 @@
 # proprietary gamedata
 data/*.lod
 
+uncompressed_data/*
+
 # downloaded external tools (other implementations etc.)
 ext-resources
 

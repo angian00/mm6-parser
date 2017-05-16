@@ -25,3 +25,8 @@ Molto ricco, con patch, contenuti originali, documentaz completa sul linguaggio 
 
 "Look into Editor.CompileBlv in Editor Data.lua and Editor.CompileOdm in Editor Odm Data.lua. Then you can see structures used in Strcts\01 common..."
 
+
+
+## RE
+
+File corto: uncompressed_data/zddb03.blv
