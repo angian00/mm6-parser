@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------
 
+#define DATA_DIR "data/"
 #define UNCOMPRESS_DIR "uncompressed_data/"
 
 struct lod_header lod_header;
@@ -25,7 +26,8 @@ struct blv_data blv_data;
 #define DUMP_SPAWNS   (1 << 8)
 #define DUMP_OUTLINES (1 << 9)
 
-#define dump_bitmask (DUMP_OUTLINES)
+#define dump_bitmask (0)
+
 
 //----------------------------------------------------------------------
 
@@ -36,12 +38,17 @@ void read_lod_header(FILE *fp, struct lod_header *p_header);
 void read_lod_dir_entry(FILE *fp, unsigned long pos, struct lod_dir_entry *p_dir_data);
 
 void parse_level_by_extension(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry);
-void parse_blv(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry);
-void parse_blv_fields(struct blv_data* bv);
 
+
+typedef void (*parse_blv_cbk)(char *, struct blv_data*);
+//void parse_blv(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry);
+void parse_blv(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry, parse_blv_cbk cbk);
+void parse_blv_fields(char *blv_name, struct blv_data* bv);
 
 void print_level_name(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry);
+
 void uncompress_level(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry);
+void uncompress_blv(char *name, struct blv_data* bv);
 
 void print_lod_header(struct lod_header* lh);
 void print_blv_data(struct blv_data* bd);
@@ -64,16 +71,24 @@ void uncompress_lod(const char lod_name[]) {
 
 
 void parse_lod(const char lod_name[], const char level_name[], parse_level_cbk cbk) {
-
+	char full_path[100];
 	FILE *fp;
 	struct lod_dir_entry dir_entry;
 	unsigned long curr_lod_pos;
 
 
-	//TODO: prepend default dir
-	fp = fopen(lod_name, "rb");
+	if (strstr(lod_name, "/")) {
+		strcpy(full_path, lod_name);
+	} else {
+		//prepend default dir
+		strcpy(full_path, DATA_DIR);
+		strcat(full_path, lod_name);
+	}
+
+
+	fp = fopen(full_path, "rb");
 	if (!fp) {
-		fprintf(stderr, " !! Could not open file: %s \n", lod_name);
+		fprintf(stderr, " !! Could not open file: %s \n", full_path);
 		exit(-1);
 	}
 
@@ -118,7 +133,7 @@ void parse_level_by_extension(FILE *fp, unsigned long curr_pos, struct lod_dir_e
 	}
 
 	if (!strcmp(ext, ".blv")) {
-	 	parse_blv(fp, curr_pos, p_dir_entry);
+	 	parse_blv(fp, curr_pos, p_dir_entry, parse_blv_fields);
 
 	} else {
 	 	//TODO: dlv odm ddm
@@ -128,46 +143,29 @@ void parse_level_by_extension(FILE *fp, unsigned long curr_pos, struct lod_dir_e
 }
 
 
+
 void uncompress_level(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry) {
-	//TODO: unify with parse_blv
-	struct blv_compressed_blv6_header compr_header;
-
-	unsigned long tot_offset = sizeof(struct lod_header) + p_dir_entry->start_offset;
-	fseek(fp, tot_offset, SEEK_SET);
-	fread(&compr_header, sizeof(compr_header), 1, fp);
-
-	unsigned char compr_data[compr_header.compressed_size];
-	fread(compr_data, (int)compr_header.compressed_size, 1, fp);
-
-	blv_data.size = compr_header.uncompressed_size;
-	blv_data.buffer = malloc(compr_header.uncompressed_size);
-	
-	unsigned long read_len = compr_header.uncompressed_size;
- 	int rc = uncompress(blv_data.buffer, &read_len, compr_data, compr_header.compressed_size);
-
- 	if (rc || (read_len != compr_header.uncompressed_size)) {
- 		fprintf(stderr, "!! error uncompressing BLV: %.16s; read_len:%lu; unc_len: %"PRIu32" \n", 
- 			p_dir_entry->name, read_len, compr_header.uncompressed_size);
- 		return;
- 	}
+ 	parse_blv(fp, curr_pos, p_dir_entry, uncompress_blv);
+}
 
 
+void uncompress_blv(char *name, struct blv_data* bv) {
  	FILE *wfp;
 	char unc_filename[100];
 	strcpy(unc_filename, UNCOMPRESS_DIR);
-	strcat(unc_filename, p_dir_entry->name);
+	strcat(unc_filename, name);
 
 	wfp = fopen(unc_filename, "wb");
 	if (!wfp) {
 		fprintf(stderr, "!! could not write %s \n", unc_filename);
  		return;
 	}
-	fwrite(blv_data.buffer, blv_data.size, 1, wfp);
+	fwrite(bv->buffer, bv->size, 1, wfp);
 	fclose(wfp);
 }
 
 
-void parse_blv(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry) {
+void parse_blv(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry, parse_blv_cbk cbk) {
 	struct blv_compressed_blv6_header compr_header;
 
 	unsigned long tot_offset = sizeof(struct lod_header) + p_dir_entry->start_offset;
@@ -189,11 +187,11 @@ void parse_blv(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_ent
  		return;
  	}
 
- 	parse_blv_fields(&blv_data);
+ 	cbk(p_dir_entry->name, &blv_data);
 }
 
 
-void parse_blv_fields(struct blv_data* bd) {
+void parse_blv_fields(char *name, struct blv_data* bd) {
  	void *curr_pos = bd->buffer;
 
  	bd->p_blv_header = (struct blv_header *)curr_pos;

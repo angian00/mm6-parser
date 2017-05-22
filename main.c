@@ -9,7 +9,7 @@ void usage_exit();
 void cmd_dump(char *lod_name, char *level_name, char *section_name);
 void cmd_list(char *lod_name);
 void cmd_uncompress(char *lod_name);
-
+void cmd_visualize(char *lod_name);
 
 
 int main(int argc, char *argv[]) {
@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
 			usage_exit(argv, -1);
 		}
 
-		cmd_dump(argv[2], argv[3], (argc >=5) && argv[4]);
+		cmd_dump(argv[2], argv[3], (char *)((argc >=5) && argv[4]));
 
 	} else if (!strcmp(cmd, "list")) {
 		if (argc <= 2) {
@@ -48,8 +48,13 @@ int main(int argc, char *argv[]) {
 		cmd_uncompress(argv[2]);
 
 	} else if (!strcmp(cmd, "visualize")) {
-		printf("TODO visualize\n");
-		usage_exit(argv, 0);
+		if (argc <= 2) {
+			printf(" !! Missing argument \n");
+			usage_exit(argv, -1);
+		}
+
+		cmd_visualize(argv[2]);
+
 	} else {
 		printf(" !! Unknown command: %s \n", cmd);
 		usage_exit(argv, 0);
@@ -63,7 +68,7 @@ void usage_exit(char *argv[], int rc) {
 	printf("    Usage: %s   help \n", argv[0]);
 	printf("             \t | dump <lod_name> <level_name> [section_name] \n");
 	printf("             \t | list <lod_name> \n");
-	printf("             \t | uncompress TODO\n");
+	printf("             \t | uncompress <lod_name> \n");
 	printf("             \t | visualize TODO \n");
 	printf("\n");
 
@@ -86,6 +91,11 @@ void cmd_dump(char *lod_name, char *level_name, char *section_name) {
 
 void cmd_uncompress(char *lod_name) {
 	uncompress_lod(lod_name);
+}
+
+void cmd_visualize(char *lod_name) {
+	//visualize(lod_name);
+	printf(" !! TODO: visualize \n");
 }
 
 

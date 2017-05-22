@@ -1,11 +1,10 @@
-## Milestone
+# TODO
 
-- parsing .BLV
-	- lettura descrizione 
-	- lettura tutte sottosezioni
+- usare MMEditor
+
+- integrare comando "visualize"
 
 - openGL
-	- hello world 
 	- verificare x windows
 	- visualizz 2D BLV
 
