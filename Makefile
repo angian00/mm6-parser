@@ -1,9 +1,10 @@
 CC=gcc
-CFLAGS=-c -Wall -g -std=gnu99 -I/usr/include/SDL2
-LDFLAGS=-g
+CFLAGS=-c -Wall -g -std=gnu99 -I/usr/local/include
+LDFLAGS=-g -L/usr/local/lib
 SOURCES=main.c parser.c graphics.c geometry.c
 OBJECTS=$(SOURCES:.c=.o)
-LIBS=-lGL -lGLEW -lSDL2 -lz
+#LIBS=-lGL -lGLEW -lSDL2 -lz
+LIBS=-lGLEW -lSDL2 -lz -framework OpenGL
 #LDLIBS=
 EXECUTABLE=mm6_parse.x
 
