@@ -3,9 +3,11 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include "geometry.h"
 
 
 //--------------------------------------------------------------
+//--- Data structures
 
 struct lod_header {
     char id[4];
@@ -259,6 +261,7 @@ struct blv_data
 };
 
 //--------------------------------------------------------------
+//--- Function declarations
 
 
 void list_levels(const char lod_name[]);
@@ -267,6 +270,9 @@ void uncompress_lod(const char lod_name[]);
 
 void dump_lod_header();
 void dump_blv();
+
+
+void extract_blv_outlines(uint32_t *n_lines, struct point **lines);
 
 
 #endif  //PARSER_H

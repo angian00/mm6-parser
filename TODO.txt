@@ -1,7 +1,5 @@
 # TODO
 
-- usare MMEditor
-
 - integrare comando "visualize"
 
 - openGL

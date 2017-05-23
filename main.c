@@ -1,15 +1,16 @@
 #define MAP_LOD "Games.lod"
 
 #include "parser.h"
+#include "graphics.h"
 #include <stdlib.h>
 #include <string.h>
 
 
 void usage_exit();
-void cmd_dump(char *lod_name, char *level_name, char *section_name);
+void cmd_dump(char *lod_name, char *level_name);
 void cmd_list(char *lod_name);
 void cmd_uncompress(char *lod_name);
-void cmd_visualize(char *lod_name);
+void cmd_visualize(char *lod_name, char *level_name);
 
 
 int main(int argc, char *argv[]) {
@@ -29,7 +30,7 @@ int main(int argc, char *argv[]) {
 			usage_exit(argv, -1);
 		}
 
-		cmd_dump(argv[2], argv[3], (char *)((argc >=5) && argv[4]));
+		cmd_dump(argv[2], argv[3]);
 
 	} else if (!strcmp(cmd, "list")) {
 		if (argc <= 2) {
@@ -48,12 +49,12 @@ int main(int argc, char *argv[]) {
 		cmd_uncompress(argv[2]);
 
 	} else if (!strcmp(cmd, "visualize")) {
-		if (argc <= 2) {
+		if (argc <= 3) {
 			printf(" !! Missing argument \n");
 			usage_exit(argv, -1);
 		}
 
-		cmd_visualize(argv[2]);
+		cmd_visualize(argv[2], argv[3]);
 
 	} else {
 		printf(" !! Unknown command: %s \n", cmd);
@@ -80,7 +81,7 @@ void cmd_list(char *lod_name) {
 	list_levels(lod_name);
 }
 
-void cmd_dump(char *lod_name, char *level_name, char *section_name) {
+void cmd_dump(char *lod_name, char *level_name) {
 	parse_level(lod_name, level_name);
 	printf("LOD %s: \n", lod_name);
 	dump_lod_header();
@@ -93,9 +94,19 @@ void cmd_uncompress(char *lod_name) {
 	uncompress_lod(lod_name);
 }
 
-void cmd_visualize(char *lod_name) {
-	//visualize(lod_name);
-	printf(" !! TODO: visualize \n");
+void cmd_visualize(char *lod_name, char *level_name) {
+	struct point *lines;
+	uint32_t n_lines;
+
+	parse_level(lod_name, level_name);
+	
+	extract_blv_outlines(&n_lines, &lines);
+	// printf("---- Prima ---- \n");
+	// print_geometry(2*n_lines, lines);
+	normalize_geometry(2*n_lines, lines);
+	// printf("---- Dopo ---- \n");
+	// print_geometry(2*n_lines, lines);
+	visualize2d(n_lines, lines);
 }
 
 

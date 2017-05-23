@@ -8,12 +8,11 @@
 
 
 //----------------------------------------------------------------------
+//--- Constants
 
 #define DATA_DIR "data/"
 #define UNCOMPRESS_DIR "uncompressed_data/"
 
-struct lod_header lod_header;
-struct blv_data blv_data;
 
 #define DUMP_VERTICES (1 << 0)
 #define DUMP_WALLS    (1 << 1)
@@ -29,7 +28,15 @@ struct blv_data blv_data;
 #define dump_bitmask (0)
 
 
+//--------------------------------------------------------------
+//--- Global variables
+
+struct lod_header lod_header;
+struct blv_data blv_data;
+
+
 //----------------------------------------------------------------------
+//--- Internal function declarations
 
 typedef void (*parse_level_cbk)(FILE *, unsigned long, struct lod_dir_entry*);
 
@@ -56,6 +63,8 @@ void print_blv_objects(struct blv_data* bd);
 void print_blv_outlines(struct blv_data* bd);
 
 //----------------------------------------------------------------------
+//--- Implementation
+
 
 void parse_level(const char lod_name[], const char level_name[]) {
 	parse_lod(lod_name, level_name, parse_level_by_extension);
@@ -338,4 +347,26 @@ void print_blv_data(struct blv_data* bd) {
 	 	}
 	}
  }
+
+void extract_blv_outlines(uint32_t *p_n_lines, struct point **p_lines) {
+	*p_n_lines = blv_data.p_outline_section->count;
+	*p_lines = malloc(sizeof(struct point)*2*(*p_n_lines));
+
+ 	for (uint32_t i=0; i < *p_n_lines; i++) {
+ 		struct outline o = blv_data.outlines[i];
+
+		if ( (o.i_v1 == 0) && (o.i_v2 == 0) ) {
+			//ignore
+	 		continue;
+		}
+
+		struct vertex v1 = blv_data.vertices[o.i_v1];
+		struct vertex v2 = blv_data.vertices[o.i_v2];
+
+ 		(*p_lines)[i*2].x = v1.x;
+ 		(*p_lines)[i*2].y = v1.y;
+ 		(*p_lines)[i*2+1].x = v2.x;
+ 		(*p_lines)[i*2+1].y = v2.y;
+ 	}
+}
 
