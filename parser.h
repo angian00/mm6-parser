@@ -60,7 +60,7 @@ struct vertex_section
 
 struct vertex
 {
-  uint16_t x, y, z;
+  int16_t x, y, z;
 };
 
 
