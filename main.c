@@ -70,7 +70,7 @@ void usage_exit(char *argv[], int rc) {
 	printf("             \t | dump <lod_name> <level_name> [section_name] \n");
 	printf("             \t | list <lod_name> \n");
 	printf("             \t | uncompress <lod_name> \n");
-	printf("             \t | visualize TODO \n");
+	printf("             \t | visualize <lod_name> <blv name> \n");
 	printf("\n");
 
 	exit(rc);
