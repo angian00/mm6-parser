@@ -38,13 +38,13 @@ struct blv_data blv_data;
 //----------------------------------------------------------------------
 //--- Internal function declarations
 
-typedef void (*parse_level_cbk)(FILE *, unsigned long, struct lod_dir_entry*);
+typedef void (*parse_file_cbk)(FILE *, unsigned long, struct lod_dir_entry*);
 
-void parse_lod(const char lod_name[], const char level_name[], parse_level_cbk cbk);
+void parse_lod(const char lod_name[], const char file_name[], parse_file_cbk cbk);
 void read_lod_header(FILE *fp, struct lod_header *p_header);
 void read_lod_dir_entry(FILE *fp, unsigned long pos, struct lod_dir_entry *p_dir_data);
 
-void parse_level_by_extension(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry);
+void parse_file_by_extension(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry);
 
 
 typedef void (*parse_blv_cbk)(char *, struct blv_data*);
@@ -52,9 +52,9 @@ typedef void (*parse_blv_cbk)(char *, struct blv_data*);
 void parse_blv(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry, parse_blv_cbk cbk);
 void parse_blv_fields(char *blv_name, struct blv_data* bv);
 
-void print_level_name(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry);
+void print_file_name(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry);
 
-void uncompress_level(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry);
+void uncompress_file(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry);
 void uncompress_blv(char *name, struct blv_data* bv);
 
 void print_lod_header(struct lod_header* lh);
@@ -66,20 +66,20 @@ void print_blv_outlines(struct blv_data* bd);
 //--- Implementation
 
 
-void parse_level(const char lod_name[], const char level_name[]) {
-	parse_lod(lod_name, level_name, parse_level_by_extension);
+void parse_file(const char lod_name[], const char file_name[]) {
+	parse_lod(lod_name, file_name, parse_file_by_extension);
 }
 
-void list_levels(const char lod_name[]) {
-	parse_lod(lod_name, NULL, print_level_name);
+void list_files(const char lod_name[]) {
+	parse_lod(lod_name, NULL, print_file_name);
 }
 
 void uncompress_lod(const char lod_name[]) {
-	parse_lod(lod_name, NULL, uncompress_level);
+	parse_lod(lod_name, NULL, uncompress_file);
 }
 
 
-void parse_lod(const char lod_name[], const char level_name[], parse_level_cbk cbk) {
+void parse_lod(const char lod_name[], const char file_name[], parse_file_cbk cbk) {
 	char full_path[100];
 	FILE *fp;
 	struct lod_dir_entry dir_entry;
@@ -108,7 +108,7 @@ void parse_lod(const char lod_name[], const char level_name[], parse_level_cbk c
 	for (unsigned int i_lod_entry = 0; i_lod_entry < lod_header.num_files; i_lod_entry ++) {
 		read_lod_dir_entry(fp, curr_lod_pos, &dir_entry);
 
-		if ( (level_name != NULL) && strcmp(level_name, dir_entry.name)) {
+		if ( (file_name != NULL) && strcmp(file_name, dir_entry.name)) {
 		 	goto next_entry;
 		}
 
@@ -134,10 +134,11 @@ void read_lod_dir_entry(FILE *fp, unsigned long pos, struct lod_dir_entry *p_dir
 }
 
 
-void parse_level_by_extension(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry) {
+void parse_file_by_extension(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry) {
 	char *ext = strrchr(p_dir_entry->name, '.');
 	if (!ext) {
-		// no extension, file skipped
+		// no extension, assume compressed header is present
+
 		return;
 	}
 
@@ -153,7 +154,7 @@ void parse_level_by_extension(FILE *fp, unsigned long curr_pos, struct lod_dir_e
 
 
 
-void uncompress_level(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry) {
+void uncompress_file(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry) {
  	parse_blv(fp, curr_pos, p_dir_entry, uncompress_blv);
 }
 
@@ -263,7 +264,7 @@ void parse_blv_fields(char *name, struct blv_data* bd) {
 }
 
 
-void print_level_name(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry) {
+void print_file_name(FILE *fp, unsigned long curr_pos, struct lod_dir_entry *p_dir_entry) {
 	printf("%s \n", p_dir_entry->name);
 }
 

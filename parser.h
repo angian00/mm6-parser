@@ -260,12 +260,15 @@ struct blv_data
     struct outline *outlines;
 };
 
+
+
+
 //--------------------------------------------------------------
 //--- Function declarations
 
 
-void list_levels(const char lod_name[]);
-void parse_level(const char lod_name[], const char level_name[]);
+void list_files(const char lod_name[]);
+void parse_file(const char lod_name[], const char level_name[]);
 void uncompress_lod(const char lod_name[]);
 
 void dump_lod_header();

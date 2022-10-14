@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
 void usage_exit(char *argv[], int rc) {
 	printf("\n");
 	printf("    Usage: %s   help \n", argv[0]);
-	printf("             \t | dump <lod_name> <level_name> [section_name] \n");
+	printf("             \t | dump <lod_name> <file_name> \n");
 	printf("             \t | list <lod_name> \n");
 	printf("             \t | uncompress <lod_name> \n");
 	printf("             \t | visualize <lod_name> <blv name> \n");
@@ -78,15 +78,15 @@ void usage_exit(char *argv[], int rc) {
 
 
 void cmd_list(char *lod_name) {
-	list_levels(lod_name);
+	list_files(lod_name);
 }
 
-void cmd_dump(char *lod_name, char *level_name) {
-	parse_level(lod_name, level_name);
+void cmd_dump(char *lod_name, char *file_name) {
+	parse_file(lod_name, file_name);
 	printf("LOD %s: \n", lod_name);
 	dump_lod_header();
 
-	printf("level %s: \n", level_name);
+	printf("file %s: \n", file_name);
 	dump_blv();
 }
 
@@ -94,11 +94,11 @@ void cmd_uncompress(char *lod_name) {
 	uncompress_lod(lod_name);
 }
 
-void cmd_visualize(char *lod_name, char *level_name) {
+void cmd_visualize(char *lod_name, char *file_name) {
 	struct point *lines;
 	uint32_t n_lines;
 
-	parse_level(lod_name, level_name);
+	parse_file(lod_name, file_name);
 	
 	extract_blv_outlines(&n_lines, &lines);
 	// printf("---- Prima ---- \n");

@@ -1,1 +1,0 @@
-For file format specification, see http://rewiki.regengedanken.de/wiki/Might_and_Magic_6.
