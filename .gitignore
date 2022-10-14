@@ -3,7 +3,8 @@
 *.x
 
 # proprietary gamedata
-data/*.lod
+mm6_data
+mm7_data
 
 uncompressed_data/*
 
