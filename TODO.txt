@@ -1,14 +1,16 @@
 # TODO
 
+---------------------------------------------
+
 - integrare comando "visualize"
 
-- openGL
++ openGL
 	- verificare x windows
 	- visualizz 2D BLV
 
-- parsing .ODM
++ parsing .ODM
 	- lettura tutte sottosezioni
 
 
-- visualizzatore 3D
++ visualizzatore 3D
 
