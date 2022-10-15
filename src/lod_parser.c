@@ -178,8 +178,6 @@ char *lod_file_load(const char *gamedir, const char *lod_name, const char *lod_e
 	}
 
 	int buffer_len = p_dir_entry->length;
-	printf("buffer_len: %d\n", buffer_len);
-
 	char *buffer = malloc(buffer_len);
 	fseek(fp, p_dir_entry->bin_offset, SEEK_SET);
 	fread(buffer, buffer_len, 1, fp);

@@ -42,7 +42,7 @@ struct tga_data
 
 //----   Gamefile data format  ----------
 
-struct lod_bin_entry_header
+struct bin_file_header
 {
     char fname[16];
     uint32_t image0_size;
@@ -60,7 +60,7 @@ struct lod_bin_entry_header
 //--- Internal function declarations
 //----------------------------------------------------------------------
 
-char *get_file_type(struct lod_bin_entry_header compr_header);
+char *get_file_type(struct bin_file_header file_header);
 
 int tga2bitmap(struct tga_data *p_tga, struct bitmap *p_bitmap);
 int bitmap2png(struct bitmap *p_bitmap, char *png_path);
@@ -81,33 +81,27 @@ struct tga_data *tga_parse(char *raw_data)
 	//printf("tga_parse\n");
 
 	char *p_data = raw_data;
-
-	struct lod_bin_entry_header compr_header;
-	printf("lod_bin_entry_header size: %llu\n", sizeof(struct lod_bin_entry_header)); //
+	struct bin_file_header file_header;
 	
-	memcpy(&compr_header, p_data, sizeof(struct lod_bin_entry_header));
-	p_data += sizeof(struct lod_bin_entry_header);
+	memcpy(&file_header, p_data, sizeof(struct bin_file_header));
+	p_data += sizeof(struct bin_file_header);
 
-	char *file_type = get_file_type(compr_header);
-	assert(file_type && !strcmp(file_type, "TGA"));
+	char *file_type = get_file_type(file_header);
+	if ((!file_type) || strcmp(file_type, "TGA"))
+		return NULL;
 
-	char compr_data[compr_header.compressed_size];
-	memcpy(compr_data, p_data, compr_header.compressed_size);
-	p_data += compr_header.compressed_size;
+	unsigned char compr_data[file_header.compressed_size];
+	memcpy(compr_data, p_data, file_header.compressed_size);
+	p_data += file_header.compressed_size;
 
 
 	struct tga_data *p_tga = malloc(sizeof(struct tga_data));
 	
-	p_tga->size = compr_header.uncompressed_size;
-	p_tga->width = compr_header.width0;
-	p_tga->height = compr_header.height0;
+	p_tga->size = file_header.uncompressed_size;
+	p_tga->width = file_header.width0;
+	p_tga->height = file_header.height0;
 
-	printf("uncompressed_size: %d\n", compr_header.uncompressed_size);
-	printf("compressed_size: %d\n", compr_header.compressed_size);
-	printf("p_tga->width: %llu\n", p_tga->width);
-	printf("p_tga->height: %llu\n", p_tga->height);
-
-	p_tga->pixels = z_uncompress(compr_data, compr_header.compressed_size, compr_header.uncompressed_size);
+	p_tga->pixels = z_uncompress(compr_data, file_header.compressed_size, file_header.uncompressed_size);
 
 	//TODO: parse multi-resolution images
 
@@ -117,10 +111,8 @@ struct tga_data *tga_parse(char *raw_data)
 	}
 
 	memcpy(p_tga->palette, p_data, 256 * sizeof(struct px));
-	//print_palette(p_tga->palette);
-	print_pixel_indices(p_tga);
 
-	//p_data += 256 * sizeof(struct px); assert(p_data - raw_data == compr_header.uncompressed_size + ...);
+	//p_data += 256 * sizeof(struct px); assert(p_data - raw_data == file_header.uncompressed_size + ...);
 
 	return p_tga;
 }
@@ -133,11 +125,11 @@ void tga_export_png(char *out_path, struct tga_data *p_tga)
 	struct bitmap bitmap;
 
 /*
-	printf("image0_size: %u \n", p_compr_header->image0_size);
-	printf("compressed_size: %u \n", p_compr_header->compressed_size);
-	printf("width0: %hu \n", p_compr_header->width0);
-	printf("height0: %hu \n", p_compr_header->height0);
-	printf("uncompressed_size: %u \n", p_compr_header->uncompressed_size);
+	printf("image0_size: %u \n", p_file_header->image0_size);
+	printf("compressed_size: %u \n", p_file_header->compressed_size);
+	printf("width0: %hu \n", p_file_header->width0);
+	printf("height0: %hu \n", p_file_header->height0);
+	printf("uncompressed_size: %u \n", p_file_header->uncompressed_size);
 	printf("n_large_tga: %d \n", n_large_tga);
 	printf("\n");
 */
@@ -148,9 +140,6 @@ void tga_export_png(char *out_path, struct tga_data *p_tga)
 	//printf("after tga2bitmap \n");
 	if (bitmap2png(&bitmap, out_path))
 		return;
-
-	//print_palette(p_tga->palette);
-	print_pixel_indices(p_tga);
 
 	printf("Saved image file to %s\n", out_path);
 }
@@ -175,9 +164,9 @@ void tga_export_bmp(char *out_path, struct tga_data *p_tga)
 
 //--- Internal functions definition
 
-char *get_file_type(struct lod_bin_entry_header compr_header)
+char *get_file_type(struct bin_file_header file_header)
 {
-	if (!strncmp(compr_header.fname + strlen(compr_header.fname) + 1, "TGA", 3))
+	if (!strncmp(file_header.fname + strlen(file_header.fname) + 1, "TGA", 3))
 		return "TGA";
 
 	//TODO: check for other types
@@ -198,7 +187,6 @@ int tga2bitmap(struct tga_data *p_tga, struct bitmap *p_bitmap) {
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
 			//lookup pixel data for (x,y) in palette
-			//memcpy(pixel_at(p_bitmap, x, y), p_tga->palette + p_tga->buffer[w * y + x], sizeof(struct px));
 			memcpy(pixel_at(p_bitmap, x, y), &p_tga->palette[(int)p_tga->pixels[w * y + x]], sizeof(struct px));
 		}
 	}

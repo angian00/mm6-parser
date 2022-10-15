@@ -1,16 +1,6 @@
 # TODO
 
----------------------------------------------
 
-- integrare comando "visualize"
-
-+ openGL
-	- verificare x windows
-	- visualizz 2D BLV
-
-+ parsing .ODM
-	- lettura tutte sottosezioni
-
-
-+ visualizzatore 3D
+- integrare comando "stats"
+- migliorare creazione directory
 
